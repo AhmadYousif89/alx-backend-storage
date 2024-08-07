@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Test for file 101-average_weighted_score.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+cat '101-init.sql' | mysql -uroot hbtn_advanced
+cat '../101-average_weighted_score.sql' | mysql -uroot hbtn_advanced
+cat '101-main.sql' | mysql -uroot hbtn_advanced
