@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Test for file 0-uniq_users.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+echo "SELECT * FROM users;" | mysql -uroot hbtn_advanced
+cat '../0-uniq_users.sql' | mysql -uroot hbtn_advanced
+echo 'INSERT INTO users (email, name) VALUES ("bob@dylan.com", "Bob");' | mysql -uroot hbtn_advanced
+echo 'INSERT INTO users (email, name) VALUES ("sylvie@dylan.com", "Sylvie");' | mysql -uroot hbtn_advanced
+echo 'INSERT INTO users (email, name) VALUES ("bob@dylan.com", "Jean");' | mysql -uroot hbtn_advanced
+echo "SELECT * FROM users;" | mysql -uroot hbtn_advanced

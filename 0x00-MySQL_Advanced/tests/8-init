@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Test for file 8-index_my_names.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+# cat '../names.sql' | mysql -uroot hbtn_advanced
+echo 'SELECT COUNT(name) FROM names WHERE name LIKE "a%";' | mysql -uroot hbtn_advanced
+cat '../8-index_my_names.sql' | mysql -uroot hbtn_advanced
+echo 'SHOW index FROM names;' | mysql -uroot hbtn_advanced
+echo 'SELECT COUNT(name) FROM names WHERE name LIKE "a%";' | mysql -uroot hbtn_advanced

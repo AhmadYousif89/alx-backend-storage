@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Test for file 10-div.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+cat '10-init.sql' | mysql -uroot hbtn_advanced
+cat '../10-div.sql' | mysql -uroot hbtn_advanced
+echo "SELECT (a / b) FROM numbers;" | mysql -uroot hbtn_advanced
+echo "SELECT SafeDiv(a, b) FROM numbers;" | mysql -uroot hbtn_advanced

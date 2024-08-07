@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Test for file 1-country_users.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+echo "SELECT * FROM users;" | mysql -uroot hbtn_advanced
+cat '../1-country_users.sql' | mysql -uroot hbtn_advanced
+echo 'INSERT INTO users (email, name, country) VALUES ("bob@dylan.com", "Bob", "US");' | mysql -uroot hbtn_advanced
+echo 'INSERT INTO users (email, name, country) VALUES ("sylvie@dylan.com", "Sylvie", "CO");' | mysql -uroot hbtn_advanced 
+echo 'INSERT INTO users (email, name, country) VALUES ("jean@dylan.com", "Jean", "FR");' | mysql -uroot hbtn_advanced 
+echo 'INSERT INTO users (email, name) VALUES ("john@dylan.com", "John");' | mysql -uroot hbtn_advanced
+echo "SELECT * FROM users;" | mysql -uroot hbtn_advanced

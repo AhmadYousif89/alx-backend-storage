@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Test for file 11-need_meeting.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+cat '11-init.sql' | mysql -uroot hbtn_advanced
+cat '../11-need_meeting.sql' | mysql -uroot hbtn_advanced
+cat '11-main.sql' | mysql -uroot hbtn_advanced

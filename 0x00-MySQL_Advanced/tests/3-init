@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Test for file 3-glam_rock.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+cat '../metal_bands.sql' | mysql -uroot hbtn_advanced
+cat '../3-glam_rock.sql' | mysql -uroot hbtn_advanced

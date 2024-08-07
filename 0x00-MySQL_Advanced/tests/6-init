@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Test for file 6-bonus.sql
+
+echo "CREATE DATABASE IF NOT EXISTS hbtn_advanced;" | mysql -uroot
+#----------------
+cat '6-init.sql' | mysql -uroot hbtn_advanced
+cat '../6-bonus.sql' | mysql -uroot hbtn_advanced
+cat '6-main.sql' | mysql -uroot hbtn_advanced
