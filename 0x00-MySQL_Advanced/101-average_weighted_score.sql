@@ -1,7 +1,7 @@
 -- SQL script that creates a stored procedure ComputeAverageWeightedScoreForUsers that computes and store the average weighted score for all students.
 -- Procedure ComputeAverageWeightedScoreForUsers must not take any input.
 
-DELIMITER //
+DELIMITER ..
 DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers;
 CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
 BEGIN
@@ -14,4 +14,4 @@ BEGIN
     )
     AS RESULT SET user.average_score = RESULT.aws
     WHERE user.id = RESULT.id;
-END //
+END ..
