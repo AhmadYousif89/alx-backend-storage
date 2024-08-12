@@ -27,3 +27,7 @@ def log_stats():
     )
     for ip in ips:
         print(f"\t{ip.get('ip')}: {ip.get('count')}")
+
+
+if __name__ == "__main__":
+    log_stats()
