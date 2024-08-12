@@ -2,4 +2,4 @@
 // The new attribute is 'address' with value '972 Mission street'
 where = { name: 'Holberton school' };
 data = { $set: { address: '972 Mission street' } };
-db.school.updateOne(where, data);
+db.school.update(where, data);
