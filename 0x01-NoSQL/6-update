@@ -1,0 +1,5 @@
+// Add new attribute to a document in a collection 'school' where the name is 'Holberton school'
+// The new attribute is 'address' with value '972 Mission street'
+where = { name: 'Holberton school' };
+data = { $set: { address: '972 Mission street' } };
+db.school.updateOne(where, data);
