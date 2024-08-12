@@ -25,3 +25,5 @@ def log_stats():
             {"$limit": 10},
         ]
     )
+    for ip in ips:
+        print(f"\t{ip.get('ip')}: {ip.get('count')}")
