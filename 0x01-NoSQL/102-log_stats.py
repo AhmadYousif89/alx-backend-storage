@@ -23,7 +23,7 @@ def log_stats():
             {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}},
             {"$limit": 10},
-            {"$project": {"_id": False, "ip": True, "count": True}},
+            {"$project": {"_id": False, "ip": "$_id", "count": True}},
         ]
     )
     for ip in ips:
