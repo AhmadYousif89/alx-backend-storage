@@ -2,4 +2,5 @@
 // The new attribute is 'address' with value '972 Mission street'
 where = { name: 'Holberton school' };
 data = { $set: { address: '972 Mission street' } };
-db.school.update(where, data);
+projection = { multi: true }; // Update all matching documents
+db.school.update(where, data, projection);
