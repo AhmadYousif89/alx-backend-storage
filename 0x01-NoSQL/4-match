@@ -1,2 +1,3 @@
 // List all documents in the collection 'school' where the field 'name=Holberton school'
-db.school.findOne({ name: 'Holberton school' });
+where = { name: 'Holberton school' };
+db.school.find(where);
