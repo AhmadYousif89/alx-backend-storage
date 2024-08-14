@@ -12,7 +12,15 @@ def count_calls(method: Callable) -> Callable:
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        """Wrapper function"""
+        """
+        Function to count the number of calls
+        happening on the Cache.store method.
+
+        Logic:
+        - Store the count of the method in Redis using the method name.
+        - Increment the count of the method by 1.
+        - Call the method with the arguments passed.
+        """
         self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
 
@@ -42,6 +50,27 @@ def call_history(method: Callable) -> Callable:
         return output
 
     return wrapper
+
+
+def replay(method: Callable) -> None:
+    """Display the history of calls of the Cache.store method"""
+
+    r = redis.Redis()
+    method_name = method.__qualname__
+    inputs = r.lrange(f"{method_name}:inputs", 0, -1)
+    outputs = r.lrange(f"{method_name}:outputs", 0, -1)
+    value = r.get(method_name)
+    value = value.decode("utf-8") if value else 0
+
+    if not value:
+        print(f"{method_name} was never called.")
+        return
+
+    print(f"{method_name} was called {value} times:")
+    for i, (inp, outp) in enumerate(zip(inputs, outputs), 1):
+        key = inp.decode('utf-8')
+        value = outp.decode("utf-8")
+        print(f"{method_name}(*{key}) -> {value}")
 
 
 class Cache:
