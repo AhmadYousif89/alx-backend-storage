@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writing strings to Redis"""
 
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 from uuid import uuid4
 import redis
 
@@ -20,9 +20,13 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Callable) -> Union[str, int, bytes, float]:
+    def get(
+        self, key: str, fn: Optional[Callable] = None
+    ) -> Union[str, int, bytes, float, None]:
         """Get the value from the Redis database"""
         value: bytes | None = self._redis.get(key)
+        if value is None:
+            return None
         return fn(value) if fn else value
 
     def get_str(self, key: str) -> str:
