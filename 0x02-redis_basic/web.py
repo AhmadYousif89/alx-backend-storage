@@ -1,41 +1,74 @@
 #!/usr/bin/env python3
 '''A module with tools for request caching and tracking.
 '''
-import redis
 import requests
-from functools import wraps
+import redis
+import functools
+from typing import Callable
 
-r = redis.Redis()
+# Initialize Redis client
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
 
-def counter(method):
-    """decorator for get_page function"""
+def cache_with_expiry(expiry: int):
+    """
+    Wrapper function to cache the result of a function with an expiry time.
+    """
 
-    @wraps(method)
-    def wrapper(url):
-        """wrapper function"""
-        key = "cached:" + url
-        cached_value = r.get(key)
-        if cached_value:
-            return cached_value.decode("utf-8")
+    def decorator(func: Callable):
+        """
+        Decorator to cache the result of the function with an expiry time.
+        """
 
-        key_count = "count:" + url
-        html_content = method(url)
+        @functools.wraps(func)
+        def wrapper(url: str) -> str:
+            """Wrapper"""
+            cache_key = f"cache:{url}"
+            cached_page = redis_client.get(cache_key)
+            if cached_page:
+                return cached_page.decode('utf-8')
+            # If not cached, fetch the page
+            page_content = func(url)
+            # Cache the result with expiry
+            redis_client.setex(cache_key, expiry, page_content)
+            return page_content
 
-        r.incr(key_count)
-        r.set(key, html_content, ex=10)
-        r.expire(key, 10)
-        return html_content
+        return wrapper
+
+    return decorator
+
+
+def track_access_count(func: Callable):
+    """
+    Decorator to track how many times a particular URL was accessed.
+    """
+
+    @functools.wraps(func)
+    def wrapper(url: str) -> str:
+        count_key = f"count:{url}"
+        redis_client.incr(count_key)
+        return func(url)
 
     return wrapper
 
 
-@counter
+@track_access_count
+@cache_with_expiry(10)
 def get_page(url: str) -> str:
-    """obtain the HTML content of a particular"""
-    results = requests.get(url)
-    return results.text
+    """
+    Fetches the HTML content of the given URL and returns it.
+    """
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an error for bad responses
+    return response.text
 
 
+# Example usage:
 if __name__ == "__main__":
-    get_page('http://slowwly.robertomurray.co.uk')
+    url = 'http://slowwly.robertomurray.co.uk'
+    content = get_page(url)
+    print(content)
+
+    # To check how many times the URL was accessed:
+    access_count = redis_client.get(f"count:{url}") or 0
+    print(f"URL accessed {int(access_count)} times")
