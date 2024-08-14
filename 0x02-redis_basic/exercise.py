@@ -8,13 +8,38 @@ import redis
 
 
 def count_calls(method: Callable) -> Callable:
-    """Decorator to count the number of calls to a method"""
+    """Decorator to count the number of calls on Cache.store"""
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         """Wrapper function"""
         self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
+
+    return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    """Decorator to store the history of inputs and outputs for Cache.store"""
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        Function to store the history of inputs and outputs
+        happening on the Cache.store method.
+
+        Logic:
+        - Store the inputs and outputs in a list named after the method.
+        - i.e, Cache.store:inputs and Cache.store:outputs
+        - The inputs are stored as a string representation of the arguments
+            passed to the method.
+        - The outputs are stored as a string representation of the value.
+        - Retrieve the inputs and outputs using the method name, "Cache.store".
+        """
+        self._redis.rpush(f"{method.__qualname__}:inputs", str(args))
+        output = method(self, *args, **kwargs)
+        self._redis.rpush(f"{method.__qualname__}:outputs", output)
+        return output
 
     return wrapper
 
@@ -28,6 +53,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Store the value in the Redis database and return the key"""
         key = str(uuid4())
