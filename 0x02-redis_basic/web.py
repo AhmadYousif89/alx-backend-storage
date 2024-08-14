@@ -6,20 +6,21 @@ from functools import wraps
 import requests
 import redis
 
+r = redis.Redis()
+
 
 def count_requests(method: Callable) -> Callable:
     """Decorator to count the number of requests to a URL"""
-    r = redis.Redis()
 
     @wraps(method)
     def wrapper(url):
         """Wrapper function"""
-        r.incr("count:{}".format(url))
-        cached_html = r.get("cached:{}".format(url))
+        r.incr(f"count:{url}")
+        cached_html = r.get(f"cached:{url}")
         if cached_html:
             return cached_html.decode('utf-8')
         html = method(url)
-        r.setex("cached:{}".format(url), 10, html)
+        r.setex(f"cached:{url}", 10, html)
         return html
 
     return wrapper
@@ -28,5 +29,5 @@ def count_requests(method: Callable) -> Callable:
 @count_requests
 def get_page(url: str) -> str:
     """Get the HTML content of a particular URL"""
-    req = requests.get(url)
-    return req.text
+    result = requests.get(url)
+    return result.text
