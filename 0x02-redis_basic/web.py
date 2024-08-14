@@ -7,9 +7,11 @@ from typing import Callable
 from functools import wraps
 
 
+r = redis.Redis()
+
+
 def count_requests(method: Callable) -> Callable:
     """Decorator to count the number of requests to a URL"""
-    r = redis.Redis()
 
     @wraps(method)
     def wrapper(url):
