@@ -2,8 +2,21 @@
 """Writing strings to Redis"""
 
 from typing import Callable, Optional, Union
+from functools import wraps
 from uuid import uuid4
 import redis
+
+
+def count_calls(fn: Callable) -> Callable:
+    """Decorator to count the number of calls to a method"""
+
+    @wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        """Wrapper function"""
+        self._redis.incr(fn.__qualname__)
+        return fn(self, *args, **kwargs)
+
+    return wrapper
 
 
 class Cache:
@@ -14,6 +27,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, int, bytes, float]) -> str:
         """Store the value in the Redis database and return the key"""
         key = str(uuid4())
@@ -25,8 +39,6 @@ class Cache:
     ) -> Union[str, int, bytes, float, None]:
         """Get the value from the Redis database"""
         value: bytes | None = self._redis.get(key)
-        if value is None:
-            return None
         return fn(value) if fn else value
 
     def get_str(self, key: str) -> str:
