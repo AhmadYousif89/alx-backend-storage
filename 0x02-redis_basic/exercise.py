@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writing strings to Redis"""
 
-import uuid
+from uuid import uuid4
 import redis
 
 
@@ -15,6 +15,6 @@ class Cache:
 
     def store(self, data: str | int | bytes | float) -> str:
         """Store the value in the Redis database and return the key"""
-        key = uuid.uuid4().hex
+        key = str(uuid4())
         self._redis.set(key, data)
         return key
