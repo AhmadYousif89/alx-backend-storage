@@ -17,6 +17,6 @@ class Cache:
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
         '''Store data in the cache.'''
-        randomKey = str(uuid4())
-        self._redis.set(randomKey, data)
-        return randomKey
+        key = str(uuid4())
+        self._redis.set(key, data)
+        return key
