@@ -1,34 +1,37 @@
 #!/usr/bin/env python3
 '''A module with tools for request caching and tracking.
 '''
-import requests
-import redis
-import functools
 from typing import Callable
+import redis
+import requests
+from functools import wraps
 
 # Initialize Redis client
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+redis_client = redis.Redis()
 
 
-def cache_with_expiry(expiry: int):
+def cache_with_expiry(expiry=10):
     """
     Wrapper function to cache the result of a function with an expiry time.
+
+    Args:
+        expiry (int): The expiry time in seconds, default is 10 seconds.
     """
 
-    def decorator(func: Callable):
+    def decorator(fn: Callable):
         """
         Decorator to cache the result of the function with an expiry time.
         """
 
-        @functools.wraps(func)
+        @wraps(fn)
         def wrapper(url: str) -> str:
             """Wrapper"""
-            cache_key = f"cache:{url}"
+            cache_key = url
             cached_page = redis_client.get(cache_key)
             if cached_page:
                 return cached_page.decode('utf-8')
             # If not cached, fetch the page
-            page_content = func(url)
+            page_content = fn(url)
             # Cache the result with expiry
             redis_client.setex(cache_key, expiry, page_content)
             return page_content
@@ -38,22 +41,22 @@ def cache_with_expiry(expiry: int):
     return decorator
 
 
-def track_access_count(func: Callable):
+def counter(fn: Callable):
     """
     Decorator to track how many times a particular URL was accessed.
     """
 
-    @functools.wraps(func)
+    @wraps(fn)
     def wrapper(url: str) -> str:
         count_key = f"count:{url}"
         redis_client.incr(count_key)
-        return func(url)
+        return fn(url)
 
     return wrapper
 
 
-@track_access_count
-@cache_with_expiry(10)
+@counter
+@cache_with_expiry()
 def get_page(url: str) -> str:
     """
     Fetches the HTML content of the given URL and returns it.
@@ -65,10 +68,13 @@ def get_page(url: str) -> str:
 
 # Example usage:
 if __name__ == "__main__":
-    url = 'http://slowwly.robertomurray.co.uk'
-    content = get_page(url)
-    print(content)
+    # http://slowwly.robertomurray.co.uk <== Broken link
+    url = 'https://github.com/AhmadYousif89'
+    print(get_page(url))
 
-    # To check how many times the URL was accessed:
-    access_count = redis_client.get(f"count:{url}") or 0
-    print(f"URL accessed {int(access_count)} times")
+    # Check how many times the URL was accessed:
+    access_count = redis_client.get(f"count:{url}")
+    if not access_count:
+        print("URL was never accessed.")
+    else:
+        print(f"URL accessed {int(access_count)} times")
