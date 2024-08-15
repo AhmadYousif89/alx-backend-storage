@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-'''A module with tools for request caching and tracking.
-'''
-from typing import Callable
+"""Implementing an expiring web cache and tracker using Redis."""
+
 import redis
 import requests
+from typing import Callable
 from functools import wraps
 
 # Initialize Redis client
@@ -14,8 +14,8 @@ def cache_with_expiry(expiry=10):
     """
     Wrapper function to cache the result of a function with an expiry time.
 
-    Args:
-        expiry (int): The expiry time in seconds, default is 10 seconds.
+    ### Args:
+        expiry (int): Time for cache_key to expire, default is 10 seconds.
     """
 
     def decorator(fn: Callable):
